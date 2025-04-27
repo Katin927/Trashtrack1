@@ -16,7 +16,7 @@
     overflow: hidden;
   }
   @keyframes laser-scan {
-    0%   { top:   0; }
+    0%   { top: 0; }
     100% { top: calc(100% - 2px); }
   }
   #scanner-overlay.active::before {
@@ -116,37 +116,46 @@ document.addEventListener('DOMContentLoaded', () => {
       Quagga.start();
     });
 
-    Quagga.onDetected(data => {
+    Quagga.onDetected(async data => {
       const code = data.codeResult.code;
       if (!scanning && code !== lastScanned) {
         scanning = true;
         lastScanned = code;
+
+        Quagga.pause(); // Pause scanning
         overlay.style.display = 'block';
         overlay.classList.add('active');
+
         setTimeout(async () => {
           overlay.classList.remove('active');
           overlay.style.display = 'none';
           await lookupBarcode(code);
           scanning = false;
+          Quagga.start(); // Resume scanning
         }, 2000);
       }
     });
   }
 
   async function lookupBarcode(code) {
-    const res = await fetch('/waste/api/lookup-barcode', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ barcode: code })
-    });
-    const data = await res.json();
-    if (data.item_name) {
-      lookupResult.style.display = 'block';
-      document.getElementById('item-name').textContent     = data.item_name;
-      document.getElementById('item-category').textContent = data.category;
-      document.getElementById('item-disposal').textContent = data.disposal_method || 'Unknown';
-      document.getElementById('item-tip').textContent      = data.tip;
-      logSection.style.display = 'block';
+    try {
+      const res = await fetch('/waste/api/lookup-barcode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ barcode: code })
+      });
+      const data = await res.json();
+      if (data.item_name) {
+        lookupResult.style.display = 'block';
+        document.getElementById('item-name').textContent     = data.item_name;
+        document.getElementById('item-category').textContent = data.category;
+        document.getElementById('item-disposal').textContent = data.disposal_method || 'Unknown';
+        document.getElementById('item-tip').textContent      = data.tip;
+        logSection.style.display = 'block';
+      }
+    } catch (err) {
+      console.error("Lookup error:", err);
+      alert("Failed to lookup barcode.");
     }
   }
 
@@ -163,18 +172,24 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Missing item or category.');
       return;
     }
-    const res = await fetch('/waste/api/log-waste', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ item_name: item, category })
-    });
-    if (res.ok) {
-      toast.show();
-      setTimeout(() => {
-        window.location.href = "/waste/dashboard";
-      }, 1500);
-    } else {
-      alert('Failed to log waste.');
+    try {
+      const res = await fetch('/waste/api/log-waste', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_name: item, category })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.show();
+        setTimeout(() => {
+          window.location.href = "/waste/dashboard";
+        }, 1500);
+      } else {
+        alert('Failed to log waste: ' + (data.error || 'Unknown error.'));
+      }
+    } catch (err) {
+      console.error("Log waste error:", err);
+      alert("An unexpected error occurred.");
     }
   });
 
