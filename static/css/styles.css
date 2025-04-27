@@ -1,0 +1,221 @@
+ /* ✅ Base Styles */
+ body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.5s ease; /* Smooth light/dark transition */
+}
+
+/* ✅ Light/Dark Mode Toggle for Page Background */
+body.light-mode {
+  background-color: #ffffff;
+  color: #2e2b28;
+}
+
+body.dark-mode {
+  background-color: #2e2e2e;
+  color: #f8f9fa;
+}
+
+/* ✅ Dashboard Sections (Cards) Always Dark */
+.dashboard-section {
+  background-color: #3a3a3a;
+  color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+/* ✅ Fullscreen Section Utility */
+.fullscreen-section {
+  height: 100vh;
+  width: 100vw;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ✅ Background Images */
+.hero-bg {
+  background-image: url("/static/images/hero-background.jpg");
+}
+
+.city-bg {
+  background-image: url("/static/images/background-city.png");
+}
+
+/* ✅ Overlay */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+/* ✅ Content Box */
+.content-box {
+  z-index: 2;
+  max-width: 800px;
+  padding: 2rem;
+}
+
+/* ✅ Navbar */
+.navbar {
+  background-color: #3a3a3a !important;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff !important;
+}
+
+.navbar-left img {
+  height: 35px;
+  margin-right: 0.5rem;
+}
+
+.navbar-right a {
+  text-decoration: none;
+  color: #ffffff !important;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.navbar-right a:hover {
+  background-color: #555 !important;
+  transform: scale(1.05);
+}
+
+.navbar-right a:active {
+  background-color: #222 !important;
+  transform: scale(0.98);
+}
+
+/* ✅ Scan Button */
+.scan-button {
+  margin-top: 1.5rem;
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #3a3a3a;
+  border: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.scan-button:hover {
+  background-color: #555;
+  transform: scale(1.05);
+}
+
+.scan-button:active {
+  background-color: #222;
+  transform: scale(0.98);
+}
+
+/* ✅ Truck Animation */
+.truck-horizontal {
+  position: absolute;
+  bottom: 50px;
+  left: -120px;
+  width: 150px;
+  animation: moveTruck 15s linear infinite;
+  z-index: 2;
+}
+
+@keyframes moveTruck {
+  0% { left: -120px; }
+  100% { left: 110%; }
+}
+
+/* ✅ Trash Items Animation */
+.trash-horizontal {
+  position: absolute;
+  bottom: 65px;
+  width: 80px;
+  height: 80px;
+  background-image: url("/static/images/trash.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: bounceTrash 2s ease-in-out infinite;
+  z-index: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.trash1 { left: 300px; }
+.trash2 { left: 600px; }
+.trash3 { left: 900px; }
+
+@keyframes bounceTrash {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.trash-horizontal.picked-up {
+  opacity: 0;
+}
+
+/* ✅ Responsive Truck and Trash Sizes */
+@media (max-width: 768px) {
+  .truck-horizontal {
+    width: 100px;
+  }
+
+  .trash-horizontal {
+    width: 50px;
+    height: 50px;
+  }
+
+  .content-box h1 {
+    font-size: 2rem;
+  }
+
+  .content-box p {
+    font-size: 1rem;
+  }
+}
+
+/* ✅ Waste History Collapse */
+#waste-history-collapse {
+  transition: height 0.4s ease;
+  overflow: hidden;
+}
+
+/* ✅ Smooth Fade Animation for Recycling Tips */
+#tips-carousel {
+  position: relative;
+  min-height: 80px;
+}
+
+#tips-carousel .tip-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  text-align: center;
+}
+
+#tips-carousel .tip-slide.active {
+  opacity: 1;
+  z-index: 1;
+}

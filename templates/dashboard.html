@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – TrashTrack{% endblock %}
+
+{% block content %}
+<style>
+  /* Greeting color follows the body’s theme */
+  body.light-mode .greeting { color: #2e2b28; }
+  body.dark-mode  .greeting { color: #ffffff; }
+</style>
+
+<div class="dashboard-container p-4" style="min-height: 100vh;">
+  <!-- Greeting uses .greeting instead of a fixed text-white -->
+  <h2 class="greeting mb-4">Hi {{ current_user.username }},</h2>
+
+  <script id="chart-data" type="application/json">
+    { "all": {{ all_time_chart_data|tojson }}, "recent": {{ recent_chart_data|tojson }} }
+  </script>
+
+  <div class="container-fluid">
+    <div class="row g-4">
+
+      <!-- Top Left: Log Waste -->
+      <div class="col-md-6 d-flex">
+        <div class="dashboard-section flex-grow-1 d-flex flex-column p-4 rounded shadow"
+             style="background-color: #3a3a3a; color: #ffffff;">
+          <h2>Log Your Waste</h2>
+          <div class="input-group mb-3">
+            <input type="text" id="dashboard-barcode" class="form-control" placeholder="Enter barcode (optional)">
+            <button id="barcode-lookup" class="btn btn-info">Lookup</button>
+          </div>
+          <div class="mb-3">
+            <input type="text" id="dashboard-item" class="form-control" placeholder="Type item manually">
+          </div>
+          <div class="mb-3">
+            <input type="text" id="dashboard-disposal" class="form-control"
+                   placeholder="Disposal Method (e.g., Recycle, Landfill, Compost)" readonly>
+          </div>
+          <div class="mb-3">
+            <select id="dashboard-category" class="form-select" required>
+              <option value="" disabled selected>Select a category</option>
+              <option value="Plastic">Plastic</option>
+              <option value="Metal">Metal</option>
+              <option value="Glass">Glass</option>
+              <option value="Paper">Paper</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Batteries">Batteries</option>
+              <option value="Hazardous Waste">Hazardous Waste</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="mt-auto">
+            <button id="dashboard-log" class="btn btn-success w-100">Log Your Waste</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Right: Recycling Tips -->
+      <div class="col-md-6 d-flex">
+        <div class="dashboard-section flex-grow-1 d-flex flex-column align-items-center justify-content-center p-4 rounded shadow"
+             style="background-color: #3a3a3a; color: #ffffff; min-height: 300px;">
+          <h2>Recycling Tips</h2>
+          <div id="tips-carousel" class="position-relative mt-3 w-100 overflow-hidden" style="height: 100px;">
+            <div class="tip-slide text-center active">Clean and rinse bottles before recycling.</div>
+            <div class="tip-slide text-center">Flatten cardboard boxes to save space.</div>
+            <div class="tip-slide text-center">Remove caps from plastic containers.</div>
+            <div class="tip-slide text-center">Keep glass separate from other recyclables.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Left: Waste History -->
+      <div class="col-md-6">
+        <div class="dashboard-section p-4 rounded shadow" style="background-color: #3a3a3a; color: #ffffff;">
+          <h2>Waste History</h2>
+          <button class="btn btn-secondary mb-3" type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#waste-history-collapse"
+                  aria-expanded="false"
+                  aria-controls="waste-history-collapse">
+            View Waste History
+          </button>
+          <div class="collapse" id="waste-history-collapse">
+            <ul class="list-group bg-transparent" id="waste-list">
+              {% for log in logs %}
+                <li class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center"
+                    data-category="{{ log.category }}">
+                  <span>{{ log.created_at.strftime('%Y-%m-%d') }} — {{ log.item_name }} ({{ log.category }})</span>
+                  <button class="btn btn-sm btn-danger delete-btn" data-id="{{ log.id }}">Delete</button>
+                </li>
+              {% else %}
+                <li class="list-group-item bg-dark text-white">No logs yet.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Right: Waste Breakdown -->
+      <div class="col-md-6">
+        <div class="dashboard-section d-flex flex-column align-items-center p-4 rounded shadow"
+             style="background-color: #3a3a3a; color: #ffffff;">
+          <h2>Waste Breakdown</h2>
+          <div class="mb-3 w-100">
+            <select id="chart-toggle" class="form-select">
+              <option value="all">All Time</option>
+              <option value="recent">Last 30 Days</option>
+            </select>
+          </div>
+          <canvas id="waste-chart" width="280" height="280"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification Centered -->
+<div class="position-fixed top-50 start-50 translate-middle p-3" style="z-index: 1055;">
+  <div id="toast" class="toast bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="toast-message">🎉 Congrats! Waste successfully logged!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"
+              aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

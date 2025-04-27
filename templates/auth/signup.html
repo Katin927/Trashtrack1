@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Sign Up – TrashTrack{% endblock %}
+
+{% block content %}
+<style>
+  @keyframes gradientBG {
+    0%   { background-position:   0% 50%; }
+    25%  { background-position:  50% 100%; }
+    50%  { background-position: 100% 50%; }
+    75%  { background-position:  50%   0%; }
+    100% { background-position:   0% 50%; }
+  }
+  .animated-wrapper {
+    background: linear-gradient(-45deg, #7cb342, #aed581, #64b5f6, #4dd0e1);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+  }
+</style>
+
+<div class="container-fluid p-5 animated-wrapper"
+     style="min-height: calc(100vh - 60px); position: relative; z-index: 1;">
+  <div class="row justify-content-center align-items-center"
+       style="min-height: calc(100vh - 3rem - 60px);">
+    <div class="col-md-5 col-lg-4">
+      <div class="card shadow-lg border-0"
+           style="background-color: #3a3a3a; border-radius: 1rem;">
+        <div class="card-body p-5 text-center">
+          <i class="bi bi-cpu-fill me-2 mb-3" style="font-size: 2.5rem; color: #aed581;"></i>
+          <i class="bi bi-globe2 mb-3"     style="font-size: 2.5rem; color: #aed581;"></i>
+          <h2 class="text-white mb-2">Join the Movement</h2>
+          <p class="text-light mb-4">Create your free account and help power smarter recycling 🌱⚙️</p>
+
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="mb-4">
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} small">{{ message }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <form method="POST" action="{{ url_for('auth.signup') }}">
+            <div class="mb-3 text-start">
+              <label for="username" class="form-label text-white">Username</label>
+              <input type="text"
+                     id="username"
+                     name="username"
+                     class="form-control bg-light"
+                     placeholder="Username"
+                     required>
+            </div>
+
+            <div class="mb-3 text-start">
+              <label for="email" class="form-label text-white">Email</label>
+              <input type="email"
+                     id="email"
+                     name="email"
+                     class="form-control bg-light"
+                     placeholder="Email"
+                     required>
+            </div>
+
+            <div class="mb-4 text-start">
+              <label for="password" class="form-label text-white">Password</label>
+              <div class="input-group">
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-control bg-light"
+                       placeholder="Password"
+                       required>
+                <button type="button"
+                        id="toggle-password"
+                        class="btn btn-outline-secondary">
+                  <i class="bi bi-eye" id="toggle-password-icon"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-success btn-lg w-100 mb-3">
+              Sign Up
+            </button>
+          </form>
+
+          <p class="text-white small mb-1">
+            Already have an account?
+            <a href="{{ url_for('auth.login') }}"
+               class="text-success fw-semibold">Log in</a>
+          </p>
+          <p>
+            <a href="{{ url_for('privacy_policy') }}"
+               class="text-light small">Privacy Policy</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const pwdField   = document.getElementById('password');
+    const toggleBtn  = document.getElementById('toggle-password');
+    const toggleIcon = document.getElementById('toggle-password-icon');
+    if (!pwdField || !toggleBtn || !toggleIcon) return;
+
+    toggleBtn.addEventListener('click', () => {
+      const isPwd = pwdField.type === 'password';
+      pwdField.type = isPwd ? 'text' : 'password';
+      toggleIcon.classList.toggle('bi-eye');
+      toggleIcon.classList.toggle('bi-eye-slash');
+    });
+  });
+</script>
+{% endblock %}

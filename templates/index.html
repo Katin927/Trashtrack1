@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 🌍 Hero Section -->
+<section class="fullscreen-section hero-bg text-white text-center">
+  <div class="overlay"></div>
+  <div class="content-box">
+    <h1 class="display-4 fw-bold mb-4">Scan. Recycle. Save the Earth.</h1>
+    <p class="lead">TrashTrack makes recycling easier and smarter. Simply scan any barcode, and the app instantly identifies the type of recyclable material — like plastic, glass, or metal — and tells you the correct way to dispose of it. Make better choices for the planet, one scan at a time.</p>
+    <a href="{{ url_for('waste.scan_barcode') }}" class="btn btn-success btn-lg mt-4">Start Scanning</a>
+  </div>
+</section>
+
+<!-- 🏙 City Section -->
+<section class="fullscreen-section city-bg position-relative overflow-hidden" id="city-section">
+  <div class="overlay"></div>
+  <div class="city-container position-relative w-100 h-100">
+    <img id="truck" src="{{ url_for('static', filename='images/truck.png') }}" class="truck-horizontal" alt="Truck" />
+    <div class="trash-horizontal trash1"></div>
+    <div class="trash-horizontal trash2"></div>
+    <div class="trash-horizontal trash3"></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  .fullscreen-section {
+    height: 100vh;
+    width: 100vw;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-bg {
+    background-image: url("{{ url_for('static', filename='images/hero-background.jpg') }}");
+  }
+
+  .city-bg {
+    background-image: url("{{ url_for('static', filename='images/background-city.png') }}");
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+
+  .content-box {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    padding: 2rem;
+    color: white;
+  }
+
+  .truck-horizontal {
+    position: absolute;
+    bottom: 40px;
+    left: -150px;
+    width: 150px;
+    z-index: 3;
+  }
+
+  .trash-horizontal {
+    position: absolute;
+    bottom: 70px;
+    width: 70px;
+    height: 70px;
+    background: url("{{ url_for('static', filename='images/trash.png') }}") center/contain no-repeat;
+    z-index: 2;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .trash-horizontal.picked-up {
+    opacity: 0;
+    transform: translateY(50px) scale(0.6);
+    pointer-events: none;
+  }
+
+  .trash1 { left: 25%; }
+  .trash2 { left: 45%; }
+  .trash3 { left: 65%; }
+
+  @media (max-width: 768px) {
+    .truck-horizontal { width: 100px; }
+    .trash-horizontal { width: 30px; height: 30px; }
+    .content-box h1 { font-size: 2rem; }
+    .content-box p { font-size: 1rem; }
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const truck = document.getElementById("truck");
+  const trashes = document.querySelectorAll(".trash-horizontal");
+  let position = -150;
+  const speed = 2;
+
+  function shootConfetti(x, y) {
+    if (typeof confetti === "function") {
+      confetti({
+        particleCount: 70,
+        spread: 80,
+        startVelocity: 35,
+        origin: {
+          x: x / window.innerWidth,
+          y: y / window.innerHeight
+        },
+        zIndex: 9999
+      });
+    } else {
+      console.warn("🎉 Confetti library not loaded.");
+    }
+  }
+
+  function moveTruck() {
+    position += speed;
+    truck.style.left = `${position}px`;
+
+    const truckRect = truck.getBoundingClientRect();
+
+    trashes.forEach(trash => {
+      const trashRect = trash.getBoundingClientRect();
+      const overlap = truckRect.right > trashRect.left &&
+                      truckRect.left < trashRect.right;
+
+      if (overlap && !trash.classList.contains("picked-up")) {
+        trash.classList.add("picked-up");
+        shootConfetti(trashRect.left + 25, trashRect.top + 20);
+      }
+    });
+
+    if (position < window.innerWidth + 150) {
+      requestAnimationFrame(moveTruck);
+    } else {
+      position = -150;
+      trashes.forEach(t => t.classList.remove("picked-up"));
+      requestAnimationFrame(moveTruck);
+    }
+  }
+
+  requestAnimationFrame(moveTruck);
+});
+</script>
+{% endblock %}

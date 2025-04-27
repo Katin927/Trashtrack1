@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center py-5 position-relative">
+  <h1 class="display-4 text-warning">403</h1>
+  <p class="lead mb-4">You don’t have permission to access this page.</p>
+  <a href="{{ url_for('home') }}" class="btn btn-success">Back to Home</a>
+
+  <!-- Animation -->
+  <img src="{{ url_for('static', filename='images/truck.png') }}"
+       class="truck-horizontal position-absolute start-0"
+       style="bottom: 20px; width: 120px; animation: moveTruck 12s linear infinite;" />
+
+  <div class="trash-horizontal trash1" style="left: 30%; bottom: 30px;"></div>
+  <div class="trash-horizontal trash2" style="left: 55%; bottom: 30px;"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .truck-horizontal {
+    position: absolute;
+    z-index: 2;
+  }
+
+  .trash-horizontal {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: url('{{ url_for("static", filename="images/trash.png") }}') no-repeat center/contain;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+
+  @keyframes moveTruck {
+    0% { transform: translateX(-150px); }
+    100% { transform: translateX(120vw); }
+  }
+</style>
+{% endblock %}

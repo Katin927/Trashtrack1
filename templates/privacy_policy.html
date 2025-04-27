@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy – TrashTrack{% endblock %}
+
+{% block content %}
+<style>
+  @keyframes gradientBG {
+    0%   { background-position: 0% 50%; }
+    25%  { background-position: 50% 100%; }
+    50%  { background-position: 100% 50%; }
+    75%  { background-position: 50% 0%; }
+    100% { background-position: 0% 50%; }
+  }
+  .animated-wrapper {
+    background: linear-gradient(-45deg, #7cb342, #aed581, #64b5f6, #4dd0e1);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+  }
+</style>
+
+<div class="container-fluid p-5 animated-wrapper" style="min-height: calc(100vh - 60px);">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow border-0" style="background-color:#3a3a3a; border-radius:1rem;">
+        <div class="card-body text-white p-5">
+          <h1 class="mb-4">Privacy Policy</h1>
+          <p><em>Effective date: {{ effective_date }}</em></p>
+
+          <h4>1. Introduction</h4>
+          <p>TrashTrack ("we", "our", "us") is committed to protecting your privacy and ensuring you have a positive experience on our platform. This Privacy Policy explains how we collect, use, share, and protect your personal information when you use our website and services.</p>
+
+          <h4>2. Definitions</h4>
+          <ul>
+            <li><strong>"Personal Data"</strong> means information that identifies you as an individual (e.g., username, email address).</li>
+            <li><strong>"Usage Data"</strong> refers to information about how you access and use our services (e.g., pages visited, features used).</li>
+            <li><strong>"Device Data"</strong> includes technical information about your device and connection (e.g., IP address, browser type, operating system).</li>
+          </ul>
+
+          <h4>3. Information We Collect</h4>
+          <ul>
+            <li><strong>Personal Data:</strong> Username, email address, when you sign up or contact support.</li>
+            <li><strong>Usage Data:</strong> Pages visited, timestamps, navigation paths, feature interactions.</li>
+            <li><strong>Device Data:</strong> IP address, browser type and version, operating system, mobile network information.</li>
+            <li><strong>Location Data:</strong> Approximate location based on IP address for providing localized recycling tips.</li>
+          </ul>
+
+          <h4>4. How We Collect Data</h4>
+          <p>We collect data when you:</p>
+          <ul>
+            <li>Register for an account and provide your details.</li>
+            <li>Use our scanning and logging features.</li>
+            <li>Visit our website (automatic collection via cookies and server logs).</li>
+            <li>Communicate with our support team.</li>
+          </ul>
+
+          <h4>5. Use of Your Data</h4>
+          <p>We use collected data to:</p>
+          <ul>
+            <li>Provide, operate, and maintain our services.</li>
+            <li>Personalize your experience and deliver tailored content.</li>
+            <li>Analyze usage to improve features and stability.</li>
+            <li>Send updates, security alerts, and support messages.</li>
+            <li>Prevent fraud and enforce our policies.</li>
+          </ul>
+
+          <h4>6. Data Sharing and Disclosure</h4>
+          <p>We may share your information:</p>
+          <ul>
+            <li>With service providers (e.g., hosting, analytics) under confidentiality agreements.</li>
+            <li>To comply with legal obligations or respond to lawful requests from public authorities.</li>
+            <li>In connection with a merger, acquisition, or sale of assets (users will be notified).</li>
+          </ul>
+
+          <h4>7. Third-Party Services</h4>
+          <p>We integrate with OpenFoodFacts and Earth911 APIs to enrich barcode data. Their privacy practices are governed by their respective policies. Links:</p>
+          <ul>
+            <li><a href="https://world.openfoodfacts.org/data" target="_blank" class="text-info">OpenFoodFacts Privacy Policy</a></li>
+            <li><a href="https://earth911.com/privacy/" target="_blank" class="text-info">Earth911 Privacy Policy</a></li>
+          </ul>
+
+          <h4>8. Cookies & Tracking Technologies</h4>
+          <p>We use essential cookies and similar technologies for:</p>
+          <ul>
+            <li>Maintaining user sessions and authentication.</li>
+            <li>Collecting analytics data to monitor and improve performance.</li>
+          </ul>
+          <p>You can manage or disable cookies through your browser settings, but disabling may affect functionality.</p>
+
+          <h4>9. Data Retention</h4>
+          <p>We retain your data only as long as necessary to fulfill the purposes listed in this policy or to comply with legal requirements. When no longer needed, data is securely deleted or anonymized.</p>
+
+          <h4>10. Security Measures</h4>
+          <p>We implement industry-standard safeguards including HTTPS encryption, secure server environments, and regular security assessments to protect your data from unauthorized access, alteration, or destruction.</p>
+
+          <h4>11. International Transfers</h4>
+          <p>Your data may be processed in countries outside your residence. We ensure appropriate safeguards are in place, such as standard contractual clauses, to maintain protection.</p>
+
+          <h4>12. Children’s Privacy</h4>
+          <p>Our services are not intended for children under 13. We do not knowingly collect personal data from children. If you believe we have inadvertently collected such data, please <a href="mailto:support@trashtrack.io" class="text-info">contact us</a> to request deletion.</p>
+
+          <h4>13. Your Rights</h4>
+          <p>You may request access, correction, deletion, or portability of your personal data by contacting us at <a href="mailto:support@trashtrack.com" class="text-info">support@trashtrack.com</a>. We will respond within 30 days.</p>
+
+          <h4>14. Changes to This Policy</h4>
+          <p>We may update our Privacy Policy to reflect changes in regulations or our practices. The "Effective date" above will be revised. We encourage you to review this page periodically.</p>
+
+          <h4>15. Contact Us</h4>
+          <p>For questions about this policy or our data practices, please contact:</p>
+          <p><strong>Email:</strong> <a href="mailto:support@trashtrack.com" class="text-info">support@trashtrack.com</a></p>
+          <p><strong>Address:</strong> 123 Green Avenue, Eco City, EC 54321</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trashtrack-app
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+      FLASK_APP: app.py
+      DATABASE_URL: postgresql://trashtrack_user:supersecretpassword@db:5432/trashtrack_db
+      SECRET_KEY: supersecretkey
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    command: flask run --host=0.0.0.0 --port=5000
+
+  db:
+    image: postgres:15-alpine
+    container_name: trashtrack-db
+    environment:
+      POSTGRES_USER: trashtrack_user
+      POSTGRES_PASSWORD: supersecretpassword
+      POSTGRES_DB: trashtrack_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

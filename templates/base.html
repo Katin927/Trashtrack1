@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}TrashTrack{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 🧠 Favicon: .ico fallback + PNG -->
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <link rel="icon" href="{{ url_for('static', filename='images/recycle-icon.png') }}"
+        type="image/png" sizes="32x32">
+
+  <!-- Fonts & Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 🎉 Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <!-- 📈 Chart.js for charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Theme Styles -->
+  <style id="theme-style">
+    body.light-mode {
+      background-color: #ffffff;
+      color: #2e2b28;
+    }
+    body.dark-mode {
+      background-color: #121212;
+      color: #f1f1f1;
+    }
+    .navbar.light-mode {
+      background-color: #3a3a3a !important;
+    }
+    .navbar.dark-mode {
+      background-color: #222 !important;
+    }
+    .navbar a {
+      color: #ffffff !important;
+    }
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar d-flex justify-content-between align-items-center px-4 py-3">
+      <div class="navbar-left d-flex align-items-center gap-2">
+        <img src="{{ url_for('static', filename='images/recycle-icon.png') }}"
+             alt="Recycle Icon"
+             style="height:32px; width:auto;">
+        <span class="fw-bold fs-4 text-white">TrashTrack</span>
+      </div>
+      <div class="navbar-right d-flex align-items-center gap-3">
+        <button class="theme-toggle" id="toggle-theme" title="Toggle light/dark mode">
+          <i class="bi bi-moon-fill" id="theme-icon"></i>
+        </button>
+        <a href="{{ url_for('home') }}" class="text-decoration-none">Home</a>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('waste.waste_dashboard') }}">Dashboard</a>
+          <a href="{{ url_for('waste.scan_barcode') }}">Scan Barcode</a>
+          <a href="{{ url_for('auth.logout') }}">Logout</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}">Login</a>
+          <a href="{{ url_for('auth.signup') }}">Sign Up</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  <main style="margin: 0; padding: 0;">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="text-center py-3 border-top">
+    <p class="mb-0">&copy; {{ current_year }} TrashTrack. All rights reserved.</p>
+  </footer>
+
+  <!-- ✅ Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+          crossorigin="anonymous"></script>
+
+  <!-- 🌓 Light/Dark Mode Toggle -->
+  <script>
+    const toggleBtn = document.getElementById('toggle-theme');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function applyTheme(theme) {
+      document.body.classList.remove('light-mode', 'dark-mode');
+      document.querySelector('.navbar').classList.remove('light-mode', 'dark-mode');
+
+      document.body.classList.add(`${theme}-mode`);
+      document.querySelector('.navbar').classList.add(`${theme}-mode`);
+
+      themeIcon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+      localStorage.setItem('theme', theme);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const current = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    });
+
+    // Apply saved or default theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+  </script>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

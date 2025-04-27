@@ -1,0 +1,3 @@
+[submodule "trashtrack"]
+	path = trashtrack
+	url = https://github.com/katin927/TrashTrack.git

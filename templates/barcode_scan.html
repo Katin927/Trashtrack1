@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% block title %}Scan Barcode - TrashTrack{% endblock %}
+
+{% block content %}
+<style>
+  /* Container positioning */
+  #scanner-container { position: relative; }
+
+  /* Red laser overlay */
+  #scanner-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  @keyframes laser-scan {
+    0%   { top:   0; }
+    100% { top: calc(100% - 2px); }
+  }
+  #scanner-overlay.active::before {
+    content: "";
+    position: absolute;
+    left: 0; width: 100%; height: 2px;
+    background: rgba(255, 0, 0, 0.8);
+    animation: laser-scan 2s linear forwards;
+  }
+</style>
+
+<div class="container-fluid p-5" style="min-height: 100vh;">
+  <div class="row g-5 justify-content-center">
+    <!-- Camera Scanner Section -->
+    <div class="col-md-6 p-4 rounded shadow"
+         style="background-color: #3a3a3a; color: #ffffff;">
+      <h2 class="text-center mb-3">Scan Barcode</h2>
+      <div id="scanner-container" class="border bg-black rounded mb-4" style="height: 300px;">
+        <video id="scanner-preview" style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <div id="scanner-overlay"></div>
+      </div>
+      <div class="d-grid">
+        <button id="reset-scanner" class="btn btn-outline-light btn-sm">Reset Scanner</button>
+      </div>
+    </div>
+
+    <!-- Manual Entry Section -->
+    <div class="col-md-6 p-4 rounded shadow"
+         style="background-color: #3a3a3a; color: #ffffff;">
+      <h2 class="text-center mb-3">Enter Manually</h2>
+      <div class="input-group mb-3">
+        <input type="text" id="manual-barcode" class="form-control" placeholder="Enter barcode manually">
+        <button id="manual-lookup" class="btn btn-info">Lookup</button>
+      </div>
+      <div id="lookup-result" class="mt-3" style="display: none;">
+        <p><strong>Item:</strong> <span id="item-name"></span></p>
+        <p><strong>Category:</strong> <span id="item-category"></span></p>
+        <p><strong>Disposal Method:</strong> <span id="item-disposal"></span></p>
+        <p><strong>Tip:</strong> <span id="item-tip"></span></p>
+      </div>
+      <div class="d-grid mt-4" id="log-section" style="display: none;">
+        <button id="log-waste-btn" class="btn btn-success">Log This Waste</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed top-50 start-50 translate-middle p-3" style="z-index: 1055;">
+  <div id="scan-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        🎉 Waste logged successfully!
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const video        = document.getElementById('scanner-preview');
+  const overlay      = document.getElementById('scanner-overlay');
+  const lookupResult = document.getElementById('lookup-result');
+  const logSection   = document.getElementById('log-section');
+  const toastEl      = document.getElementById('scan-toast');
+  const toast        = new bootstrap.Toast(toastEl);
+  let lastScanned    = '';
+  let scanning       = false;
+
+  async function startScanner() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      video.srcObject = stream;
+      await video.play();
+    } catch (err) {
+      console.error("Camera init error:", err);
+      return;
+    }
+
+    Quagga.init({
+      inputStream: {
+        name: "Live",
+        type: "LiveStream",
+        target: video,
+        constraints: { facingMode: "environment" }
+      },
+      decoder: {
+        readers: ["ean_reader", "upc_reader", "upc_e_reader"]
+      }
+    }, err => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      Quagga.start();
+    });
+
+    Quagga.onDetected(data => {
+      const code = data.codeResult.code;
+      if (!scanning && code !== lastScanned) {
+        scanning = true;
+        lastScanned = code;
+        overlay.style.display = 'block';
+        overlay.classList.add('active');
+        setTimeout(async () => {
+          overlay.classList.remove('active');
+          overlay.style.display = 'none';
+          await lookupBarcode(code);
+          scanning = false;
+        }, 2000);
+      }
+    });
+  }
+
+  async function lookupBarcode(code) {
+    const res = await fetch('/waste/api/lookup-barcode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ barcode: code })
+    });
+    const data = await res.json();
+    if (data.item_name) {
+      lookupResult.style.display = 'block';
+      document.getElementById('item-name').textContent     = data.item_name;
+      document.getElementById('item-category').textContent = data.category;
+      document.getElementById('item-disposal').textContent = data.disposal_method || 'Unknown';
+      document.getElementById('item-tip').textContent      = data.tip;
+      logSection.style.display = 'block';
+    }
+  }
+
+  document.getElementById('manual-lookup').addEventListener('click', async () => {
+    const code = document.getElementById('manual-barcode').value.trim();
+    if (!code) return;
+    await lookupBarcode(code);
+  });
+
+  document.getElementById('log-waste-btn').addEventListener('click', async () => {
+    const item     = document.getElementById('item-name').textContent;
+    const category = document.getElementById('item-category').textContent;
+    if (!item || !category) {
+      alert('Missing item or category.');
+      return;
+    }
+    const res = await fetch('/waste/api/log-waste', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_name: item, category })
+    });
+    if (res.ok) {
+      toast.show();
+      setTimeout(() => {
+        window.location.href = "/waste/dashboard";
+      }, 1500);
+    } else {
+      alert('Failed to log waste.');
+    }
+  });
+
+  document.getElementById('reset-scanner').addEventListener('click', () => {
+    Quagga.stop();
+    startScanner();
+  });
+
+  startScanner();
+});
+</script>
+{% endblock %}
