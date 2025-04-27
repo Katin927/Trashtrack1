@@ -9,7 +9,7 @@ import openai
 from datetime import datetime
 
 # Load environment variables
-depbasedir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, ".env"))
 
 # Create Flask app
@@ -21,7 +21,6 @@ raw_db_url = os.getenv("DATABASE_URL") or ""
 if raw_db_url.startswith("postgres://"):
     raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = raw_db_url
-
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["DEBUG"] = os.getenv("FLASK_DEBUG", "True").lower() == "true"
@@ -95,4 +94,5 @@ def inject_year():
 # Run app
 if __name__ == "__main__":
     # Use 127.0.0.1 to enable getUserMedia without HTTPS
-    app.run(host="127.0.0.1", port=5000, debug=app.config["DEBUG"])
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="127.0.0.1", port=port, debug=app.config["DEBUG"])
