@@ -9,19 +9,24 @@ import openai
 from datetime import datetime
 
 # Load environment variables
-basedir = os.path.abspath(os.path.dirname(__file__))
+depbasedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, ".env"))
 
 # Create Flask app
 app = Flask(__name__)
 
 # Config settings
-app.config["SQLALCHEMY_DATABASE_URI"]    = os.getenv("DATABASE_URL")
+# Normalize DATABASE_URL for SQLAlchemy compatibility
+raw_db_url = os.getenv("DATABASE_URL") or ""
+if raw_db_url.startswith("postgres://"):
+    raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = raw_db_url
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"]                 = os.getenv("SECRET_KEY")
-app.config["DEBUG"]                      = os.getenv("FLASK_DEBUG", "True").lower() == "true"
-app.config["OPENAI_API_KEY"]             = os.getenv("OPENAI_API_KEY")
-app.config["EARTH911_API_KEY"]           = os.getenv("EARTH911_API_KEY")
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["DEBUG"] = os.getenv("FLASK_DEBUG", "True").lower() == "true"
+app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+app.config["EARTH911_API_KEY"] = os.getenv("EARTH911_API_KEY")
 
 # Validate environment variables
 missing = []
@@ -54,9 +59,9 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # Register blueprints
-from trashtrack.routes.auth_routes  import auth_bp
+from trashtrack.routes.auth_routes import auth_bp
 from trashtrack.routes.waste_routes import waste_bp
-app.register_blueprint(auth_bp,  url_prefix="/auth")
+app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(waste_bp, url_prefix="/waste")
 
 # Core routes
