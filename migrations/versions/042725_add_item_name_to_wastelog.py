@@ -5,7 +5,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'add_item_name_field'
-down_revision = None
+down_revision = 'e2babc123d45'  # <-- your real last revision ID here
 branch_labels = None
 depends_on = None
 
