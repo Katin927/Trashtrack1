@@ -1,6 +1,7 @@
 TrashTrack 🌿
 
 Trashtrack URL: https://trashtrack1-2bb65cc65e3d.herokuapp.com/
+Github repo URL: https://github.com/Katin927/Trashtrack1 
 Project Initial Ideas: https://docs.google.com/document/d/1Bv1ZbBIUO3S3tgEqCH02lJJlElAWuz1TXBgoG-UsJSg/edit?usp=sharing 
 Project Proposal: https://docs.google.com/document/d/1Ws2wytxmnglUyyrCsaHHWI3DbmTitoWOKAfWItZMbOY/edit?usp=sharing 
 
